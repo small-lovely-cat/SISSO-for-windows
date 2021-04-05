@@ -120,10 +120,10 @@ else
   icontinue=1
   tcontinue='FC'
   if(mpirank==0) then
-     call system('rm -rf residual')
-     call system('rm -rf feature_space')
-     call system('rm -rf desc_dat')
-     call system('rm -rf models')
+     call system('rd /S /Q residual')
+     call system('rd /S /Q feature_space')
+     call system('rd /S /Q desc_dat')
+     call system('rd /S /Q models')
      call system('mkdir desc_dat feature_space residual models')
   end if
 end if
@@ -182,7 +182,7 @@ end do
 if(mpirank==0) then
  write(*,'(/a)') 'FCDI done !'
  write(9,'(/a)') 'FCDI done !'
- call system('rm CONTINUE')
+ call system('rd /S /Q CONTINUE')
 end if
 
 3001  continue
@@ -258,10 +258,11 @@ IF(nsis(iFCDI)==0) return
 ! space name file
 do i=1,iFCDI
     write(linename,'(a,i3.3,a)') 'space_',i,'d.name'
+	write(*,'(a,i3.3,a)') trim(adjustl(linename))
     if(i==1) then
-      call system('cd feature_space; cat '//trim(adjustl(linename))//' >Uspace.name')
+      call system('type feature_space\'//trim(adjustl(linename))//' > feature_space\Uspace.name')
     else
-      call system('cd feature_space; cat '//trim(adjustl(linename))//' >>Uspace.name')
+      call system('type feature_space\'//trim(adjustl(linename))//' >> feature_space\Uspace.name')
     end if
 end do
 
