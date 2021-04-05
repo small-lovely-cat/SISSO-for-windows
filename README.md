@@ -1,5 +1,4 @@
-
-Version SISSO.3.0.2, June, 2020.
+Adapted Version SISSO.3.0.2, June, 2020 for Windows.
 This code is licensed under the Apache License, Version 2.0
 
 References:   
@@ -12,7 +11,7 @@ See the wiki page for the list of publications with SISSO for materials discover
 
 Installation
 -------------
-A MPI Fortran compiler is needed for the compilation. For example, go to the folder "src" and do  
+A MPI Fortran compiler is needed for the compilation. We used the [Intel Fortran Compiler](https://software.intel.com/content/www/us/en/develop/articles/oneapi-standalone-components.html#fortran) and [Intel MPI Library](https://software.intel.com/content/www/us/en/develop/articles/oneapi-standalone-components.html#inpage-nav-9). For example, go to the folder "src" and do  
 1).  mpiifort -fp-model precise var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o ~/bin/your_code_name  
 or  
 2).  mpiifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o ~/bin/your_code_name  
@@ -49,15 +48,14 @@ Output:
 
 About
 -------------
-Created and maintained by Runhai Ouyang. Please feel free to open issues in the Github or contact Ouyang  
-(rouyang@shu.edu.cn) in case of any problems/comments/suggestions in using the code. 
+The original SISSO version is created and maintained by Runhai Ouyang. Please feel free to open issues in the [original Github repository](https://github.com/rouyang2017/SISSO) or contact Ouyang  
+(rouyang@shu.edu.cn) in case of any problems/comments/suggestions in using the code.  
+This is an adapted version for Windows.
 
 
 Other SISSO codes
 ------------------
+SISSO original: https://github.com/rouyang2017/SISSO  
 MATLAB: https://github.com/NREL/SISSORegressor_MATLAB  
 Python interface: https://github.com/Matgenix/pysisso
-
-
-
 
