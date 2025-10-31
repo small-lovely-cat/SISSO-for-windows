@@ -18,22 +18,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Fortran
+      - name: Setup Intel oneAPI
         uses: fortran-lang/setup-fortran@v1
         with:
           compiler: intel-classic
           version: '2021.10'
 
-      - name: Setup MS-MPI
-        uses: mpi4py/setup-mpi@v1
-        with:
-          mpi: msmpi
+      - name: Install Intel MPI
+        shell: pwsh
+        run: |
+          # 下载并安装 Intel MPI（与 ifort 2021.10 兼容的版本）
+          Invoke-WebRequest -Uri "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/4f5871da-0533-4f62-b563-905edfb2e49c/w_mpi_oneapi_p_2021.10.0.49374_offline.exe" -OutFile "mpi_installer.exe"
+          Start-Process -FilePath ".\mpi_installer.exe" -ArgumentList "--silent","--eula","accept" -Wait -NoNewWindow
 
       - name: Build SISSO
         shell: cmd
         run: |
+          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
           cd src
-          ifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          mpiifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
