@@ -18,20 +18,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup MSYS2 with GFortran
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: >-
-            mingw-w64-x86_64-gcc-fortran
-            mingw-w64-x86_64-msmpi
-
-      - name: Build SISSO
-        shell: msys2 {0}
+      - name: Install Intel oneAPI
+        shell: pwsh
         run: |
+          # 下载 Intel oneAPI 在线安装器
+          Invoke-WebRequest -Uri "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cb54db79-1d73-4443-8274-d712fdc2d156/intel-fortran-compiler-2025.3.0.324_offline.exe" -OutFile "fortran_installer.exe"
+          
+          # 静默安装 Intel Fortran 编译器和 MPI
+          Start-Process -FilePath ".\fortran_installer.exe" -ArgumentList "-s","-a","--silent","--eula","accept" -Wait -NoNewWindow
+          
+      - name: Build SISSO
+        shell: cmd
+        run: |
+          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
           cd src
-          mpifort -O3 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          mpiifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
