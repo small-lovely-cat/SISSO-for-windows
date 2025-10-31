@@ -18,14 +18,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Intel oneAPI
+      - name: Download Intel Fortran Compiler
+        shell: bash
+        run: |
+          # 使用 curl 下载 Intel Fortran 编译器离线安装器（显示进度）
+          curl -L -# -o fortran_installer.exe "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cb54db79-1d73-4443-8274-d712fdc2d156/intel-fortran-compiler-2025.3.0.324_offline.exe"
+          
+      - name: Download Intel MPI
+        shell: bash
+        run: |
+          # 使用 curl 下载 Intel MPI 离线安装器（显示进度）
+          curl -L -# -o mpi_installer.exe "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/44ab2be4-30c9-476d-8f79-943410ef6fa0/intel-mpi-2021.17.0.375_offline.exe"
+          
+      - name: Install Intel Fortran Compiler
         shell: pwsh
         run: |
-          # 下载 Intel oneAPI 在线安装器
-          Invoke-WebRequest -Uri "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cb54db79-1d73-4443-8274-d712fdc2d156/intel-fortran-compiler-2025.3.0.324_offline.exe" -OutFile "fortran_installer.exe"
-          
-          # 静默安装 Intel Fortran 编译器和 MPI
+          # 静默安装 Intel Fortran 编译器
           Start-Process -FilePath ".\fortran_installer.exe" -ArgumentList "-s","-a","--silent","--eula","accept" -Wait -NoNewWindow
+          
+      - name: Install Intel MPI
+        shell: pwsh
+        run: |
+          # 静默安装 Intel MPI
+          Start-Process -FilePath ".\mpi_installer.exe" -ArgumentList "-s","-a","--silent","--eula","accept" -Wait -NoNewWindow
           
       - name: Build SISSO
         shell: cmd
