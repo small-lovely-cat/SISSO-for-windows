@@ -1,4 +1,4 @@
-name: Build SISSO
+name: Build SISSO for Windows
 
 on:
   push:
@@ -11,77 +11,33 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: SISSO-linux
-            binary_name: SISSO
-          - os: windows-latest
-            artifact_name: SISSO-windows
-            binary_name: SISSO.exe
-          - os: macos-latest
-            artifact_name: SISSO-macos
-            binary_name: SISSO
+    name: Build on Windows
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Intel oneAPI (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-          sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-          rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-          sudo add-apt-repository "deb https://apt.repos.intel.com/oneapi all main"
-          sudo apt-get update
-          sudo apt-get install -y intel-oneapi-compiler-fortran intel-oneapi-mpi-devel
+      - name: Setup MSYS2 with GFortran
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-msmpi
 
-      - name: Setup Intel oneAPI (Windows)
-        if: runner.os == 'Windows'
-        shell: cmd
+      - name: Build SISSO
+        shell: msys2 {0}
         run: |
-          curl -O https://registrationcenter-download.intel.com/akdlm/IRC_NAS/7deeaac4-f605-4bcf-a81b-ea7531577c61/w_fortran-compiler_p_2024.0.0.49563_offline.exe
-          w_fortran-compiler_p_2024.0.0.49563_offline.exe -s -a --silent --eula accept
-
-      - name: Setup Intel oneAPI (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          curl -O https://registrationcenter-download.intel.com/akdlm/IRC_NAS/20f4e6a1-6b0b-4752-b8c1-e5eacba10e01/m_fortran-compiler_p_2024.0.0.49559_offline.dmg
-          hdiutil attach m_fortran-compiler_p_2024.0.0.49559_offline.dmg
-          sudo /Volumes/m_fortran-compiler_p_2024.0.0.49559_offline/bootstrapper.app/Contents/MacOS/install.sh -s -a --silent --eula accept
-
-      - name: Build SISSO (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          source /opt/intel/oneapi/setvars.sh
           cd src
-          mpiifort -fp-model precise var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o ${{ matrix.binary_name }}
-
-      - name: Build SISSO (Windows)
-        if: runner.os == 'Windows'
-        shell: cmd
-        run: |
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
-          cd src
-          mpiifort -fp-model precise var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o ${{ matrix.binary_name }}
-
-      - name: Build SISSO (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          source /opt/intel/oneapi/setvars.sh
-          cd src
-          mpiifort -fp-model precise var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o ${{ matrix.binary_name }}
+          gfortran -O3 -march=native var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: src/${{ matrix.binary_name }}
+          name: SISSO-windows
+          path: src/SISSO.exe
           retention-days: 90
 
   release:
