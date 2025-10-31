@@ -18,39 +18,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download Intel Fortran Compiler
-        shell: bash
-        run: |
-          # 使用 curl 下载 Intel Fortran 编译器离线安装器（显示进度）
-          curl -L -# -o fortran_installer.exe "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cb54db79-1d73-4443-8274-d712fdc2d156/intel-fortran-compiler-2025.3.0.324_offline.exe"
-          
-      - name: Download Intel MPI
-        shell: bash
-        run: |
-          # 使用 curl 下载 Intel MPI 离线安装器（显示进度）
-          curl -L -# -o mpi_installer.exe "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/44ab2be4-30c9-476d-8f79-943410ef6fa0/intel-mpi-2021.17.0.375_offline.exe"
-          
-      - name: Install Intel Fortran Compiler
-        shell: cmd
-        run: |
-          REM Intel oneAPI 离线安装器使用以下参数进行静默安装：
-          REM --silent 或 -s : 静默模式
-          REM --eula accept : 自动接受许可协议
-          REM --install-dir : 指定安装目录（可选）
-          fortran_installer.exe -s -a --silent --eula accept
-          
-      - name: Install Intel MPI
-        shell: cmd
-        run: |
-          REM 静默安装 Intel MPI
-          mpi_installer.exe -s -a --silent --eula accept
-          
+      - name: Setup Fortran
+        uses: fortran-lang/setup-fortran@v1
+        with:
+          compiler: intel-classic
+          version: '2021.10'
+
+      - name: Setup MS-MPI
+        uses: mpi4py/setup-mpi@v1
+        with:
+          mpi: msmpi
+
       - name: Build SISSO
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
           cd src
-          mpiifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          ifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
