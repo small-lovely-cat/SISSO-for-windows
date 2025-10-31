@@ -36,13 +36,31 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
           cd src
-          mpiifort -O2 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          mpiifort -O2 -static -qmkl:sequential var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+
+      - name: Copy required DLLs
+        shell: pwsh
+        run: |
+          # 查找并复制 Intel 运行时 DLLs 到 src 目录
+          $intelPath = "C:\Program Files (x86)\Intel\oneAPI"
+          $dllFiles = @(
+            "compiler\latest\windows\redist\intel64_win\compiler\*.dll",
+            "mpi\latest\bin\*.dll",
+            "mpi\latest\bin\release\*.dll"
+          )
+          foreach ($pattern in $dllFiles) {
+            $files = Get-ChildItem -Path (Join-Path $intelPath $pattern) -ErrorAction SilentlyContinue
+            foreach ($file in $files) {
+              Copy-Item $file.FullName -Destination "src\" -Force
+              Write-Host "Copied: $($file.Name)"
+            }
+          }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SISSO-windows
-          path: src/SISSO.exe
+          path: src/*
           retention-days: 90
 
   release:
