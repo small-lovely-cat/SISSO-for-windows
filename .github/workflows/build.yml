@@ -31,16 +31,19 @@ jobs:
           curl -L -# -o mpi_installer.exe "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/44ab2be4-30c9-476d-8f79-943410ef6fa0/intel-mpi-2021.17.0.375_offline.exe"
           
       - name: Install Intel Fortran Compiler
-        shell: pwsh
+        shell: cmd
         run: |
-          # 静默安装 Intel Fortran 编译器
-          Start-Process -FilePath ".\fortran_installer.exe" -ArgumentList "-s","-a","--silent","--eula","accept" -Wait -NoNewWindow
+          REM Intel oneAPI 离线安装器使用以下参数进行静默安装：
+          REM --silent 或 -s : 静默模式
+          REM --eula accept : 自动接受许可协议
+          REM --install-dir : 指定安装目录（可选）
+          fortran_installer.exe -s -a --silent --eula accept
           
       - name: Install Intel MPI
-        shell: pwsh
+        shell: cmd
         run: |
-          # 静默安装 Intel MPI
-          Start-Process -FilePath ".\mpi_installer.exe" -ArgumentList "-s","-a","--silent","--eula","accept" -Wait -NoNewWindow
+          REM 静默安装 Intel MPI
+          mpi_installer.exe -s -a --silent --eula accept
           
       - name: Build SISSO
         shell: cmd
