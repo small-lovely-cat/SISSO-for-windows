@@ -36,7 +36,7 @@ jobs:
         run: |
           call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
           cd src
-          mpiifort -O2 -static -qmkl:sequential var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          mpiifort -F 100000000 -O2 -static var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Copy required DLLs
         shell: pwsh
