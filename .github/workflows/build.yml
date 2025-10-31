@@ -31,7 +31,7 @@ jobs:
         shell: msys2 {0}
         run: |
           cd src
-          gfortran -O3 -march=native var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
+          mpifort -O3 var_global.f90 libsisso.f90 DI.f90 FC.f90 SISSO.f90 -o SISSO.exe
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
