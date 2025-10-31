@@ -27,8 +27,8 @@ jobs:
       - name: Install Intel MPI
         shell: pwsh
         run: |
-          # 下载并安装 Intel MPI（与 ifort 2021.10 兼容的版本）
-          Invoke-WebRequest -Uri "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/4f5871da-0533-4f62-b563-905edfb2e49c/w_mpi_oneapi_p_2021.10.0.49374_offline.exe" -OutFile "mpi_installer.exe"
+          # 下载并安装 Intel MPI
+          Invoke-WebRequest -Uri "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/44ab2be4-30c9-476d-8f79-943410ef6fa0/intel-mpi-2021.17.0.375_offline.exe" -OutFile "mpi_installer.exe"
           Start-Process -FilePath ".\mpi_installer.exe" -ArgumentList "--silent","--eula","accept" -Wait -NoNewWindow
 
       - name: Build SISSO
